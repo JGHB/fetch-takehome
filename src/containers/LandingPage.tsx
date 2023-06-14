@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
-// Define TypeScript interfaces
 interface Dog {
   id: string
   img: string
@@ -22,14 +21,21 @@ interface Location {
 }
 
 const LandingPage: React.FC = () => {
-  const [dogs, setDogs] = useState<Dog[]>([]);
-  const [selectedDogs, setSelectedDogs] = useState<string[]>([])
-  const [matchDog, setMatchDog] = useState<Dog | null>(null)
-  const [breeds, setBreeds] = useState<string[]>([]);
-  const [allBreeds, setAllBreeds] = useState<string[]>([]);
-  const [minAge, setMinAge] = useState<number | null>(null);
-  const [maxAge, setMaxAge] = useState<number | null>(null);
-  const navigate = useNavigate();
+    const [dogs, setDogs] = useState<Dog[]>([]);
+    const [paginatedDogs, setPaginatedDogs] = useState<Dog[]>([]);
+    const [selectedDogs, setSelectedDogs] = useState<string[]>([])
+    const [matchDog, setMatchDog] = useState<Dog | null>(null)
+    const [breeds, setBreeds] = useState<string[]>([]);
+    const [allBreeds, setAllBreeds] = useState<string[]>([]);
+    const [minAge, setMinAge] = useState<number | null>(null);
+    const [maxAge, setMaxAge] = useState<number | null>(null);
+    const [page, setPage] = useState<number>(1);
+    const [perPage, setPerPage] = useState<number>(10); // Default value, you can change it
+    const [totalPages, setTotalPages] = useState<number>(0);
+    const [nextPage, setNextPage] = useState<string | null>(null);
+    const [prevPage, setPrevPage] = useState<string | null>(null);
+    const [inputPerPage, setInputPerPage] = useState<number>(10); // Default value, you can change it
+    const navigate = useNavigate();
 
   useEffect(() => {
     const fetchBreeds = async () => {
@@ -47,6 +53,19 @@ const LandingPage: React.FC = () => {
     fetchBreeds();
   }, []);
 
+  useEffect(() => {
+    const totalPages = Math.ceil(dogs.length / perPage);
+    setTotalPages(totalPages);
+    
+    const startIndex = (page - 1) * perPage;
+    const endIndex = Math.min(startIndex + perPage, dogs.length);
+    setPaginatedDogs(dogs.slice(startIndex, endIndex));
+  }, [dogs, page, perPage]);
+
+  const handlePerPageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setInputPerPage(Number(event.target.value));
+  };
+
   const handleLogout = async () => {
     try {
       const response = await axios.post('https://frontend-take-home-service.fetch.com/auth/logout', {}, { withCredentials: true });
@@ -60,27 +79,55 @@ const LandingPage: React.FC = () => {
   };
 
   const handleSearch = async () => {
+
+    setPerPage(inputPerPage);
+
     try {
       const response = await axios.get('https://frontend-take-home-service.fetch.com/dogs/search', {
         params: {
           breeds,
           ageMin: minAge,
           ageMax: maxAge,
-          size: 100
+          size: inputPerPage
         },
         withCredentials: true
       });
 
       if (response.status === 200) {
-        const { resultIds } = response.data;
+        const { resultIds, next, prev } = response.data;
         const dogsResponse = await axios.post<Dog[]>('https://frontend-take-home-service.fetch.com/dogs', resultIds, { withCredentials: true });
 
         if (dogsResponse.status === 200) {
           setDogs(dogsResponse.data);
+          setNextPage(next)
+          setPrevPage(prev)
         }
       }
     } catch (error) {
       console.error('Failed to search dogs:', error);
+    }
+  };
+
+  const handlePageChange = async (direction: string) => {
+    try {
+      const page = direction === 'next' ? nextPage : prevPage;
+
+      if (page) {
+        const response = await axios.get(`https://frontend-take-home-service.fetch.com${page}`, { withCredentials: true });
+
+        if (response.status === 200) {
+          const { resultIds, next, prev } = response.data;
+          const dogsResponse = await axios.post<Dog[]>('https://frontend-take-home-service.fetch.com/dogs', resultIds, { withCredentials: true });
+
+          if (dogsResponse.status === 200) {
+            setDogs(dogsResponse.data);
+            setNextPage(next);
+            setPrevPage(prev);
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Failed to navigate to the page:', error);
     }
   };
 
@@ -121,6 +168,7 @@ const LandingPage: React.FC = () => {
     }
   };
 
+
   // Display dogs' data
   return (
     <div>
@@ -149,7 +197,10 @@ const LandingPage: React.FC = () => {
         <button onClick={handleGetDogMatch}>Find Match</button>
       </div>
       <h2>Here are some dogs for you:</h2>
-      <button onClick={() => console.log(matchDog)}>TEST2</button>
+      <div>
+        Items per page: 
+        <input type="number" value={inputPerPage} onChange={handlePerPageChange} />
+      </div>
       <div>
         {dogs.map(dog => (
           <div key={dog.id}>
@@ -161,6 +212,11 @@ const LandingPage: React.FC = () => {
             <input type="checkbox" value={dog.id} checked={selectedDogs.includes(dog.id)} onChange={handleSelectedDogChange} />
           </div>
         ))}
+      </div>
+      <div>
+        <button onClick={()=> console.log(nextPage)}>TEST3</button>
+        <button disabled={!prevPage} onClick={() => handlePageChange('prev')}>Previous</button>
+        <button disabled={!nextPage} onClick={() => handlePageChange('next')}>Next</button>
       </div>
       </div>
       )}
