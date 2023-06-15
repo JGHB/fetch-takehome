@@ -35,6 +35,13 @@ const LandingPage: React.FC = () => {
     const [nextPage, setNextPage] = useState<string | null>(null);
     const [prevPage, setPrevPage] = useState<string | null>(null);
     const [inputPerPage, setInputPerPage] = useState<number>(10); // Default value, you can change it
+    const sortOptions = [
+        { value: "breed:asc", label: "Breed A-Z" }, 
+        { value: "breed:desc", label: "Breed Z-A" }, 
+        { value: "age:asc", label: "Age Low-High" }, 
+        { value: "age:desc", label: "Age High-Low" }
+      ];
+    const [sort, setSort] = useState<string>(sortOptions[0].value);
     const navigate = useNavigate();
 
   useEffect(() => {
@@ -88,7 +95,8 @@ const LandingPage: React.FC = () => {
           breeds,
           ageMin: minAge,
           ageMax: maxAge,
-          size: inputPerPage
+          size: inputPerPage,
+          sort: sort
         },
         withCredentials: true
       });
@@ -193,6 +201,14 @@ const LandingPage: React.FC = () => {
           Max Age:
           <input type="number" value={maxAge || ''} onChange={e => setMaxAge(e.target.value ? parseInt(e.target.value, 10) : null)} />
         </label>
+        <label>
+        Sort By:
+        <select value={sort} onChange={e => setSort(e.target.value)}>
+          {sortOptions.map(option => (
+            <option key={option.value} value={option.value}>{option.label}</option>
+          ))}
+        </select>
+      </label>
         <button onClick={handleSearch}>Search</button>
         <button onClick={handleGetDogMatch}>Find Match</button>
       </div>

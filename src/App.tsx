@@ -1,5 +1,5 @@
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import LoginPage from './containers/LoginPage';
+import LoginPage from './containers/login/LoginPage';
 import LandingPage from './containers/LandingPage';
 
 const App: React.FC = () => {
