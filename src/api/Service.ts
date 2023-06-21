@@ -4,7 +4,7 @@
 
 // const api = axios.create({
 //     baseURL: BASE_URL,
-//     withCredentials: true, 
+//     withCredentials: true,
 // });
 
 // export function loginUser(name: string, email: StringConstructor) {
@@ -38,4 +38,4 @@
 // export function searchLocations(bodyParams) {
 //     return api.post('/locations/search', bodyParams);
 // }
-export {}
+export {};

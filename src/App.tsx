@@ -1,6 +1,6 @@
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import LoginPage from './containers/login/LoginPage';
-import LandingPage from './containers/LandingPage';
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import LoginPage from "./containers/login/LoginPage";
+import LandingPage from "./containers/landing/LandingPage";
 
 const App: React.FC = () => {
   return (
@@ -11,7 +11,6 @@ const App: React.FC = () => {
       </Routes>
     </Router>
   );
-}
+};
 
 export default App;
-

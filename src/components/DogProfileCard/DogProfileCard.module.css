@@ -1,0 +1,46 @@
+.container {
+  border-color: rgb(104, 85, 224);
+  color: rgb(104, 85, 224);
+  border-radius: 20px;
+  border-style: solid;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 90%;
+  max-width: 400px; 
+  border-width: 5px;
+}
+
+.container img {
+  padding-top: 5px;
+  width: 80%; 
+  height: auto; 
+  max-width: 300px; 
+  object-fit: cover;
+  border-radius: 20px;
+}
+
+.name {
+  margin-top: 5px;
+  margin-bottom: 5px;
+  font-size: 6vw;
+}
+
+.profileText {
+  margin-top: 0px;
+  margin-bottom: 0px;
+}
+
+.container button {
+  background: none;
+  border: none;
+  color: red; 
+  font-size: 24px;
+  cursor: pointer;
+}
+
+.container button:focus {
+  outline: none;
+}
